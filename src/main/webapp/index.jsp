@@ -21,35 +21,66 @@ String url = request.getRequestURL().toString();
 <h2>Hello World!</h2>
 
 
+<audio controls id="localAudio">
+  
+  Your browser does not support the audio tag.
+</audio>
+
+<audio controls id="remoteAudio">
+  Your browser does not support the audio tag.
+</audio>
+
+
 <script>
 
-function callback(ret, resp) {
+function sdkcallback(ret, resp) {
 	 if (ret == 200) {
 	    console.log("SDK "+CS.version+" initialized ");
 	    console.log(ret);
 	    console.log(CS);
-	    CS.login("feroz", "test123", function(err, resp) {
-	    	 if (err != 200) { 
-	    	   console.log("login failed with response code "+err+" reason "+resp);
-	    	 } else {
-	    	   console.log("login Successful");
-	    	  /*  CS.contacts.addContact("anurag", function (err, resp) {
-	    		   if (err != 200 && err != 204) {
-	    		     console.log("add contact failed with response code " + err + " reason " + resp);
-	    		   } else {
-	    		     console.log("contact added successfully.");
-	    		   }
-	    		  }); */
-	    	 }
-	    	});
+	    login();
 	 }
 }
+
+function login(){
+	 CS.login("feroz", "test123", function(err, resp) {
+    	 if (err != 200) { 
+    	   console.log("login failed with response code "+err+" reason "+resp);
+    	 } else {
+    	   console.log("login Successful");
+    	   placeAudioCall();
+    	 }
+    	});
+}
+
+function placeAudioCall(){
+	var callId = CS.call.startCall("anurag", "localAudio", "remoteAudio", false, audiocallbackFunc);
+	setTimeout(function(){ 
+		console.log('Call ending .........')
+		CS.call.end(callId, "Bye", function(ret, resp) {
+			  If (ret == 200)
+			      console.log("call end successfully");
+			});
+	}, 30000);
+
+}
+
+
+function audiocallbackFunc(code, resp){
+	 if (code != 200) { 
+	   alert("call failed with response code "+code+" reason "+resp);
+	 }else{
+		 console.log("audio call back ....")
+	 }
+	}
+
+
 	 let config = {
 	    appId:"pid_61f57072_4f58_4aa0_bc8f_838594cd939f"
 	 };
 $( document).ready(function() {
     console.log( "ready!" );
-    CS.initialize(config, callback);
+    CS.initialize(config, sdkcallback);
     
 });
 
